@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf import settings
 
 def test(request):
-    return JsonResponse({"message": "智慧幕墙——用户鉴权系统"})
+    return JsonResponse({'message': '智慧幕墙——用户鉴权系统'})
 
 settings.configure(
     DEBUG=True,
