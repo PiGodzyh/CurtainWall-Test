@@ -1,21 +1,13 @@
-FROM openjdk:21-jdk-slim AS builder
+FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY pom.xml ./
-COPY src ./src
-COPY mvnw .
-COPY .mvn .mvn
+COPY requirements.txt .
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM openjdk:21-jdk-slim
-
-WORKDIR /app
-
-COPY --from=builder /app/target/UserAuthentication-1.0.0.jar app.jar
+COPY app.py .
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+CMD ["python", "app.py"]
