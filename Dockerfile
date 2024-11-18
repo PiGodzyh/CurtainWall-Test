@@ -10,7 +10,9 @@ COPY requirements.txt /app/
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libmariadb-dev-compat \
-    libmariadb-dev
+    libmariadb-dev \
+    gcc \
+    build-essential
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
