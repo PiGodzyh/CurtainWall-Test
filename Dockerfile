@@ -19,4 +19,4 @@ COPY . /app/
 
 EXPOSE 8080
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "myproject.wsgi:application"]
