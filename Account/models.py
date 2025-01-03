@@ -19,8 +19,9 @@ class User(AbstractUser):
     access_system_b = models.BooleanField(default=False)
     access_system_c = models.BooleanField(default=False)
     access_system_d = models.BooleanField(default=False)
-    access_system_e = models.BooleanField(default=False)
+    access_system_v = models.BooleanField(default=False)
     access_system_f = models.BooleanField(default=False)
     access_system_g = models.BooleanField(default=False)
     access_system_h = models.BooleanField(default=False)
+    access_system_z = models.BooleanField(default=False)
 

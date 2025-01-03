@@ -75,7 +75,7 @@ class IsSystemDUser(BasePermission):
         return request.user.access_system_d
 
 
-class IsSystemEUser(BasePermission):
+class IsSystemVUser(BasePermission):
     # 无权限时返回给前端的信息
     message = {
         "code": 403,
@@ -84,7 +84,7 @@ class IsSystemEUser(BasePermission):
 
     def has_permission(self, request, view):
         """控制对obj对象的访问权限，此案例决绝所有对对象的访问"""
-        return request.user.access_system_e
+        return request.user.access_system_v
 
 
 class IsSystemFUser(BasePermission):
@@ -121,3 +121,14 @@ class IsSystemHUser(BasePermission):
     def has_permission(self, request, view):
         """控制对obj对象的访问权限，此案例决绝所有对对象的访问"""
         return request.user.access_system_h
+    
+class IsSystemZUser(BasePermission):
+    # 无权限时返回给前端的信息
+    message = {
+        "code": 403,
+        "message": "无系统H权限"
+    }
+
+    def has_permission(self, request, view):
+        """控制对obj对象的访问权限，此案例决绝所有对对象的访问"""
+        return request.user.access_system_z

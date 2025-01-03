@@ -37,10 +37,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['access_system_b'] = user.access_system_a
         token['access_system_c'] = user.access_system_b
         token['access_system_d'] = user.access_system_c
-        token['access_system_e'] = user.access_system_e
+        token['access_system_v'] = user.access_system_v
         token['access_system_f'] = user.access_system_f
         token['access_system_g'] = user.access_system_g
         token['access_system_h'] = user.access_system_h
+        token['access_system_z'] = user.access_system_z
 
         return token
 

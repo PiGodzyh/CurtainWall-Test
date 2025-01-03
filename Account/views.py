@@ -207,10 +207,11 @@ class SuperPermission(GenericViewSet):
             user_dict['access_system_b'] = temp['access_system_b']
             user_dict['access_system_c'] = temp['access_system_c']
             user_dict['access_system_d'] = temp['access_system_d']
-            user_dict['access_system_e'] = temp['access_system_e']
+            user_dict['access_system_v'] = temp['access_system_v']
             user_dict['access_system_f'] = temp['access_system_f']
             user_dict['access_system_g'] = temp['access_system_g']
             user_dict['access_system_h'] = temp['access_system_h']
+            user_dict['access_system_z'] = temp['access_system_z']
 
         return Response.OkResponseData(users_dict)
 
@@ -245,10 +246,11 @@ class CustomPermission(GenericViewSet):
         permission_dict['access_system_b'] = temp['access_system_b']
         permission_dict['access_system_c'] = temp['access_system_c']
         permission_dict['access_system_d'] = temp['access_system_d']
-        permission_dict['access_system_e'] = temp['access_system_e']
+        permission_dict['access_system_v'] = temp['access_system_v']
         permission_dict['access_system_f'] = temp['access_system_f']
         permission_dict['access_system_g'] = temp['access_system_g']
         permission_dict['access_system_h'] = temp['access_system_h']
+        permission_dict['access_system_z'] = temp['access_system_z']
         return Response.OkResponseData(permission_dict)
 
 
