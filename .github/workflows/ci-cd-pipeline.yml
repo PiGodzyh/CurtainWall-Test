@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  workflow:
     uses: Intelligent-Curtain-Wall/.workflows/.github/workflows/ci-cd-pipeline.yml@main
     with:
       image-tag: user-authentication
