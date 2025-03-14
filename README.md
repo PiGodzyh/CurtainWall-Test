@@ -1,6 +1,6 @@
 # User Authentication System
 
-User authentication system (backend application)
+User Authentication System (Backend Application)
 
 用户鉴权系统（后端应用程序）
 
