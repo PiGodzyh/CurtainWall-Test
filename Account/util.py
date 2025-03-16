@@ -26,8 +26,8 @@ def sendemail(code, destination):
     # 1. 连接邮箱服务器
     con = smtplib.SMTP_SSL('smtp.qq.com', 465)
 
-    sender_account = "906929332@qq.com"  # ！！！请不要一直使用同一个邮箱
-    sender_account_passcode = "qgsuutqmcedgbcdb" # 授权码
+    sender_account = "237793303@qq.com"  # ！！！请不要一直使用同一个邮箱
+    sender_account_passcode = "hvmzeatnquaacagj" # 授权码
 
     # 2. 登录邮箱
     con.login(sender_account, sender_account_passcode)
@@ -41,7 +41,7 @@ def sendemail(code, destination):
     msg['Subject'] = subject
     # 设置邮件发送者
     # msg['From'] = 'TongjiSE@tongji.edu.cn'
-    fromName64 = base64.b64encode(bytes("奇点的星海", 'utf-8'))
+    fromName64 = base64.b64encode(bytes("神猪降世", 'utf-8'))
     fromName64str = str(fromName64, 'utf-8')
     # 尖括号拼接用双引号
     fromNamestr = '"=?utf-8?B?' + fromName64str + '=?=" <' + sender_account + ">"
