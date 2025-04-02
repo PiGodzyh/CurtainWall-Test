@@ -186,32 +186,48 @@ class SuperPermission(GenericViewSet):
             return Response.OkResponse()
         else:
             return Response.ErrorResponse(400,"邮箱不存在或权限未更改")
-    # API：获取所有用户的权限信息
+        
+    # API：获取指定用户的权限信息
+    # 参数：
+    #     username：用户名搜索关键字
     # 返回值：
     #     所有用户的权限信息
     @csrf_exempt
     @swagger_auto_schema(
         method='GET',
-        manual_parameters=[],
-        operation_description="GET /account/getAllPermissions/")
-    @action(methods=['GET'], detail=False)
-    def getAllPermissions(self, request):
+        manual_parameters=[
+            {
+                "name": "username",
+                "in": "query",
+                "description": "搜索包含指定关键字的用户名",
+                "required": False,
+                "type": "string"
+            }
+        ],
+        operation_description="GET /account/getUserPermissions/")
+    @action(methods=['GET'], detail=False, permission_classes=[AllowAny])
+    def getUserPermissions(self, request):
+        username = request.GET.get('username', None)  # 获取查询参数 username
         users = User.objects.all()
+
+        if username:
+            # 如果提供了 username 参数，则过滤用户
+            users = users.filter(username__icontains=username)
+
         users_dict = {}
         for user in users:
-            users_dict[user.username] = {}
-            user_dict = users_dict[user.username]
-            temp = model_to_dict(user)
-            user_dict['is_superuser'] = temp['is_superuser']
-            user_dict['access_system_a'] = temp['access_system_a']
-            user_dict['access_system_b'] = temp['access_system_b']
-            user_dict['access_system_c'] = temp['access_system_c']
-            user_dict['access_system_d'] = temp['access_system_d']
-            user_dict['access_system_v'] = temp['access_system_v']
-            user_dict['access_system_f'] = temp['access_system_f']
-            user_dict['access_system_g'] = temp['access_system_g']
-            user_dict['access_system_h'] = temp['access_system_h']
-            user_dict['access_system_z'] = temp['access_system_z']
+            users_dict[user.username] = {
+                'is_superuser': user.is_superuser,
+                'access_system_a': user.access_system_a,
+                'access_system_b': user.access_system_b,
+                'access_system_c': user.access_system_c,
+                'access_system_d': user.access_system_d,
+                'access_system_v': user.access_system_v,
+                'access_system_f': user.access_system_f,
+                'access_system_g': user.access_system_g,
+                'access_system_h': user.access_system_h,
+                'access_system_z': user.access_system_z,
+            }
 
         return Response.OkResponseData(users_dict)
 

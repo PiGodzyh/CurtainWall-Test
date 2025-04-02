@@ -22,7 +22,7 @@ urlpatterns = [
  path('getSubsysUser',Account.as_view({'get':'getSubsysUser'})),
 
  path('super/updatePermission', SuperPermission.as_view({'post':'updatePermission'})),
- path('super/getAllPermissions', SuperPermission.as_view({'get':'getAllPermissions'})),
+ path('super/getUserPermissions', SuperPermission.as_view({'get':'getUserPermissions'})),
 
  path('custom/getPermissions',CustomPermission.as_view({'get':'getPermissions'})),
 
