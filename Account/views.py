@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.forms import model_to_dict
 from django.http import JsonResponse
@@ -67,6 +68,11 @@ class Account(GenericViewSet):
 
         # 生成验证码并发送
         code = get_random_string(length=4, allowed_chars='0123456789')
+
+        # 验证邮箱格式
+        if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+            return JsonResponse({'message': '邮箱格式不正确'}, status=400)
+
         sendemail(code, email)  # 出错点
         validate_data[email] = code
         return Response.OkResponseMessage('验证码已发送，请检查您的邮箱')
