@@ -88,19 +88,21 @@ def process_user(users):
             return True
         if permissions.get('method') == "table":
             old_user = User.objects.get_by_natural_key(username)
-            pass
         else:
             try:
                 old_user = User.objects.get_by_natural_key(username)
             except:
                 return False
         for permission, value in permissions.items():
+            if permission == "method":
+                continue
             old_value = getattr(old_user, permission)
             # 检查权限是否被修改
             if old_value != value:
                 setattr(old_user, permission, value)
                 old_user.save()
-                return True
+                # return True
             else:
                 print("权限未变，无需修改")
-                return False
+                # return False
+    return True
