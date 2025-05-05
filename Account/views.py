@@ -105,6 +105,8 @@ class Account(GenericViewSet):
         data = json.loads(request.body)
         email = data.get('email')
         password = data.get('password')
+        if password == "":
+            return Response.ErrorResponse(400,'密码不能为空')
         code = data.get('code')
         # 检查验证码
         if email in validate_data and validate_data[email] == code:
