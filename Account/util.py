@@ -10,18 +10,13 @@ from django.http import JsonResponse, HttpResponse
 # 参数：
 #   code：验证码
 #   destination：目标邮箱    
-def sendemail(code, destination):
+def sendemail(header, message, destination):
     # 检查验证码或邮箱地址是否为空
-    if not code or not destination:
-        raise ValueError('验证码或邮箱地址为空')
+    if not message:
+        raise ValueError('消息为空')
 
-    # 检查验证码是否为四位数字
-    if not code.isdigit() or len(code) != 4:
-        raise ValueError('验证码必须是四位数字')
-
-    # 检查邮箱地址是否合法
-    if '@' not in destination or '.' not in destination:
-        raise ValueError('邮箱地址不合法')
+    if not destination:
+        raise ValueError('邮箱地址为空')
 
     # 1. 连接邮箱服务器
     con = smtplib.SMTP_SSL('smtp.qq.com', 465)
@@ -37,7 +32,7 @@ def sendemail(code, destination):
     # 创建邮件对象
     msg = MIMEMultipart()
     # 设置邮件主题
-    subject = Header('幕墙系统注册验证码', 'utf-8').encode()
+    subject = Header(header, 'utf-8').encode()
     msg['Subject'] = subject
     # 设置邮件发送者
     # msg['From'] = 'TongjiSE@tongji.edu.cn'
@@ -49,7 +44,7 @@ def sendemail(code, destination):
     # 设置邮件接受者
     msg['To'] = Header(destination)
     # 验证码内容
-    text = MIMEText('注册验证码是：'+code, 'plain', 'utf-8')
+    text = MIMEText(message, 'plain', 'utf-8')
     msg.attach(text)
     # 3.发送邮件
     con.sendmail(sender_account, destination, msg.as_string())

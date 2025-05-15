@@ -4,7 +4,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from Account.models import User
-from Account.util import Response
+from Account.util import Response, sendemail
+import threading
 
 # 类名：UserSerializer
 # 功能：提供User类的序列化功能
@@ -75,6 +76,27 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+# 更新数据
+updated_users = {}
+# 定时器
+current_timer = None
+# 功能：发送用户权限更新邮件
+# 参数：
+#   users：object，包含多个users数据
+#       username：string
+#       permission：object，包含一个用户的所有权限
+def send_update_message():
+    print("发送更新邮件")
+    global updated_users
+    for email, permissions in updated_users.items():
+        if permissions:
+            message = "您的幕墙账号权限已更新，请登录检查\n"
+            sendemail("权限更新", message, email)
+        
+    global current_timer
+    current_timer = None
+    updated_users = {}
+
 # 功能：用户权限更新
 # 参数：
 #   users：object，包含多个users数据
@@ -83,6 +105,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
 def process_user(users):
     print("输入内容为：",users)
     old_user = ""
+    global current_timer, updated_users
+
     for username, permissions in users.items():
         if username == "admin":
             return True
@@ -101,6 +125,27 @@ def process_user(users):
             if old_value != value:
                 setattr(old_user, permission, value)
                 old_user.save()
+
+                # 记录权限更新
+                email = old_user.email
+                # 若不存在则添加
+                if email not in updated_users.keys():
+                    updated_users[email] = {}
+                if permission not in updated_users[email].keys():
+                    updated_users[email][permission] = value
+                else: 
+                    # 如果已经存在说明更新了两次相当于没更新，删去该键值对
+                    updated_users[email].pop(permission, None)
+
+                # 发送邮件
+                # 如果有定时器则取消
+                
+                if current_timer is not None:
+                    current_timer.cancel()
+                # 设置定时器，一段时间内没有新请求则发送权限更新邮件
+                current_timer = threading.Timer(15, send_update_message)
+                current_timer.start()
+                print("当前定时器：", current_timer)
                 # return True
             else:
                 print("权限未变，无需修改")

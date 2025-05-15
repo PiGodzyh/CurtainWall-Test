@@ -73,7 +73,7 @@ class Account(GenericViewSet):
         if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
             return JsonResponse({'message': '邮箱格式不正确'}, status=400)
 
-        sendemail(code, email)  # 出错点
+        sendemail("幕墙验证码", '您的幕墙验证码是：' + code, email)  # 出错点
         validate_data[email] = code
         return Response.OkResponseMessage('验证码已发送，请检查您的邮箱')
 
