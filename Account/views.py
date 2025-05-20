@@ -40,9 +40,10 @@ class Account(GenericViewSet):
 
     sendCode_body = openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['email'],
+        required=['email','method'],
         properties={
             'email': openapi.Schema(type=openapi.TYPE_STRING, description='邮箱'),
+            'method': openapi.Schema(type=openapi.TYPE_STRING, description='邮箱', enum=['register','reset']),
         }
     )
     # API：给邮箱发验证码
@@ -58,20 +59,27 @@ class Account(GenericViewSet):
         operation_description="POST /account/sendCode/")
     @action(methods=['POST'], detail=False)
     def sendCode(self, request):
-        # postman测试用raw
         data = json.loads(request.body)
         email = data.get('email')
+        method = data.get('method')
+        if method not in ['register', 'reset']:
+            return JsonResponse({'message': '无效的请求'}, status=400)
 
-        # 检查邮箱是否已被注册
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({'message': '该邮箱已经注册'}, status=400)
+        if method == 'register':
+            # 检查邮箱是否已被注册
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'message': '该邮箱已经注册'}, status=400)
+            # 验证邮箱格式
+            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+                return JsonResponse({'message': '邮箱格式不正确'}, status=400)
+            
+        if method == 'reset':
+            # 检查邮箱是否存在
+            if not User.objects.filter(email=email).exists():
+                return JsonResponse({'message': '用户不存在'}, status=400)
 
         # 生成验证码并发送
         code = get_random_string(length=4, allowed_chars='0123456789')
-
-        # 验证邮箱格式
-        if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
-            return JsonResponse({'message': '邮箱格式不正确'}, status=400)
 
         sendemail("幕墙验证码", '您的幕墙验证码是：' + code, email)  # 出错点
         validate_data[email] = code
@@ -87,7 +95,7 @@ class Account(GenericViewSet):
             'code': openapi.Schema(type=openapi.TYPE_STRING, description='验证码'),
         }
     )
-    # API：验证验证码
+    # API：验证验证码并
     # 参数：
     #   email：用户邮箱
     #   password：用户密码
@@ -102,20 +110,36 @@ class Account(GenericViewSet):
         operation_description="POST /account/validate/")
     @action(methods=['POST'], detail=False)
     def validate(self, request):
-        data = json.loads(request.body)
-        email = data.get('email')
-        password = data.get('password')
-        if password == "":
-            return Response.ErrorResponse(400,'密码不能为空')
-        code = data.get('code')
-        # 检查验证码
-        if email in validate_data and validate_data[email] == code:
-            # 创建新用户
-            user = User.objects.create_user(username=email, email=email, password=password)
-            user.save()
-            return Response.OkResponseMessage('注册成功')
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
+            # 检查密码是否为空
+            if not password:
+                return Response.ErrorResponse(400, '密码不能为空')
+            code = data.get('code')
 
-        return Response.ErrorResponse(400,'验证码错误或已过期')
+            # 检查验证码
+            if email in validate_data and validate_data[email] == code:
+                try:
+                    # 尝试获取用户
+                    user = User.objects.get(email=email)
+                    # 如果用户已存在，修改密码
+                    user.set_password(password)
+                    user.save()
+                    return Response.OkResponseMessage('密码修改成功')
+                except User.DoesNotExist:
+                    # 如果用户不存在，创建新用户
+                    user = User.objects.create_user(username=email, email=email, password=password)
+                    user.save()
+                    # 向管理员发送注册成功邮件
+                    admin=User.objects.get(is_superuser=True)
+                    sendemail("注册成功", '新用户注册：' + email, admin.email)
+                    return Response.OkResponseMessage('注册成功')
+            else:
+                return Response.ErrorResponse(400, '验证码错误或已过期')
+        except Exception as e:
+            return Response.ErrorResponse(500, f'服务器错误: {str(e)}')
 
     getSubsysUser_sysname = openapi.Parameter('sysname', openapi.IN_QUERY, description="system name", type=openapi.TYPE_STRING)
     # API：获取某个子系统下的所有账户
