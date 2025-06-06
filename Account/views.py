@@ -127,6 +127,7 @@ class Account(GenericViewSet):
                     # 如果用户已存在，修改密码
                     user.set_password(password)
                     user.save()
+                    del validate_data[email]  # 删除验证码，防止重复使用
                     return Response.OkResponseMessage('密码修改成功')
                 except User.DoesNotExist:
                     # 如果用户不存在，创建新用户
@@ -135,6 +136,7 @@ class Account(GenericViewSet):
                     # 向管理员发送注册成功邮件
                     admin=User.objects.get(is_superuser=True)
                     sendemail("注册成功", '新用户注册：' + email, admin.email)
+                    del validate_data[email]  # 删除验证码，防止重复使用
                     return Response.OkResponseMessage('注册成功')
             else:
                 return Response.ErrorResponse(400, '验证码错误或已过期')

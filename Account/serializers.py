@@ -108,15 +108,10 @@ def process_user(users):
     global current_timer, updated_users
 
     for username, permissions in users.items():
-        if username == "admin":
-            return True
-        if permissions.get('method') == "table":
+        try:
             old_user = User.objects.get_by_natural_key(username)
-        else:
-            try:
-                old_user = User.objects.get_by_natural_key(username)
-            except:
-                return False
+        except:
+            return False
         for permission, value in permissions.items():
             if permission == "method":
                 continue
